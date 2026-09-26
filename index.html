@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>収入管理</title>
+<title>給与計算</title>
 <meta name="theme-color" content="#1E6F5C">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.png" type="image/png">
@@ -49,7 +49,7 @@
     margin-bottom: 18px;
   }
   header.app-header h1 {
-    font-size: 17px;
+    font-size: 23px;
     font-weight: 700;
     margin: 0;
     letter-spacing: 0.02em;
@@ -62,23 +62,53 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+    background: var(--accent);
+    color: #eafaf4;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 9px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 700;
+    box-shadow: 0 2px 0 rgba(0,0,0,.15);
+    min-width: 44px;
+    white-space: nowrap;
+  }
+  .header-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .header-btn:active { background: #17594A; box-shadow: 0 1px 0 rgba(0,0,0,.1); }
+
+  .install-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .install-bar span {
+    font-size: 13px;
+    color: var(--text);
+  }
+  .install-btn {
     border: none;
     background: var(--accent);
     color: #fff;
-    border-radius: 16px;
-    padding: 10px 16px;
     font-family: inherit;
-    cursor: pointer;
-  }
-  .header-btn .hb-icon {
-    display: block;
-  }
-  .header-btn .hb-label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
   }
-  .header-btn:active { background: #17594A; }
 
   .year-nav {
     display: flex;
@@ -307,19 +337,24 @@
 <body>
 <div class="wrap">
   <header class="app-header">
-    <h1>収入管理</h1>
+    <h1>給与計算</h1>
     <div class="header-actions">
       <button class="header-btn" id="exportBtn">
-        <svg class="hb-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-        <span class="hb-label">保存</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        保存
       </button>
       <button class="header-btn" id="importBtn">
-        <svg class="hb-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
-        <span class="hb-label">読込</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        読込
       </button>
       <input type="file" id="importFile" accept="application/json" style="display:none">
     </div>
   </header>
+
+  <div class="install-bar" id="pwaInstallBar">
+    <span>📲 ホーム画面に追加できます</span>
+    <button class="install-btn" id="installBtn">追加</button>
+  </div>
 
   <div class="year-nav">
     <button id="prevYear" aria-label="前の年">◀</button>
@@ -563,6 +598,25 @@
       navigator.serviceWorker.register('sw.js').catch(function () { /* ignore */ });
     });
   }
+
+  // --- ホーム画面に追加の案内 ---
+  var installPromptEvent = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    installPromptEvent = e;
+    document.getElementById('pwaInstallBar').style.display = 'flex';
+  });
+  window.addEventListener('appinstalled', function () {
+    document.getElementById('pwaInstallBar').style.display = 'none';
+    installPromptEvent = null;
+  });
+  document.getElementById('installBtn').addEventListener('click', function () {
+    if (!installPromptEvent) return;
+    installPromptEvent.prompt();
+    installPromptEvent.userChoice.then(function () {
+      installPromptEvent = null;
+    });
+  });
 })();
 </script>
 </body>
