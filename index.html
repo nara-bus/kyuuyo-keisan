@@ -332,6 +332,39 @@
     --danger-soft: #3D2420;
     --border: #2B3B37;
   }
+
+  .save-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.45);
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .save-overlay.open { display: flex; }
+  .save-sheet {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 22px 18px 18px;
+    width: 100%; max-width: 320px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  }
+  .save-title {
+    font-size: 16px; font-weight: 700;
+    color: var(--accent);
+    text-align: center; margin-bottom: 12px;
+  }
+  .save-info {
+    font-size: 13px; color: var(--text-muted);
+    line-height: 1.7; margin-bottom: 16px;
+  }
+  .save-info strong { display: block; color: var(--text); word-break: break-all; }
+  .save-actions { display: flex; gap: 10px; }
+  .save-cancel, .save-ok {
+    padding: 12px; border-radius: 10px;
+    font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .save-cancel { flex: 1; background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+  .save-ok { flex: 2; background: var(--accent); color: #fff; border: none; }
 </style>
 </head>
 <body>
@@ -386,6 +419,20 @@
   </div>
 
   <div class="footer-note">入力内容はこの端末に自動で保存されます。</div>
+</div>
+
+<div class="save-overlay" id="saveModal">
+  <div class="save-sheet">
+    <div class="save-title">💾 データを保存</div>
+    <div class="save-info">
+      <strong id="saveFilename"></strong>
+      「保存する」を押すと「ダウンロード」フォルダに保存されます。
+    </div>
+    <div class="save-actions">
+      <button class="save-cancel" id="saveCancelBtn">キャンセル</button>
+      <button class="save-ok" id="saveOkBtn">保存する</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -540,12 +587,25 @@
     render();
   });
 
+  var saveModal = document.getElementById('saveModal');
+  var saveFilename = document.getElementById('saveFilename');
+
   document.getElementById('exportBtn').addEventListener('click', function () {
-    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
     var now = new Date();
     var pad = function (n) { return String(n).padStart(2, '0'); };
-    var fname = 'syunyu-kanri-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '.json';
+    saveFilename.textContent = 'syunyu-kanri-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) + '.json';
+    saveModal.classList.add('open');
+  });
+
+  document.getElementById('saveCancelBtn').addEventListener('click', function () {
+    saveModal.classList.remove('open');
+  });
+
+  document.getElementById('saveOkBtn').addEventListener('click', function () {
+    var fname = saveFilename.textContent;
+    saveModal.classList.remove('open');
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
     a.download = fname;

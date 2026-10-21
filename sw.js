@@ -1,5 +1,5 @@
-const APP_VERSION = '20260926-016';
-const CACHE_NAME = '20260926-016';
+const APP_VERSION = '20261021-001';
+const CACHE_NAME = '20261021-001';
 const ASSETS = [
   './', './index.html', './manifest.json',
   './icon-192.png', './icon-512.png', './icon-512-maskable.png', './favicon.png'
